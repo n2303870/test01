@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en-us">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+  <title>Last to blast</title>
+  <style>
+    html, body {
+      margin: 0;
+      padding: 0;
+      background: #111;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+    }
+
+    #unity-container {
+      position: absolute;
+      top: 0; left: 0; right: 0; bottom: 0;
+      width: 100%;
+      height: 100%;
+    }
+
+    canvas {
+      width: 100% !important;
+      height: 100% !important;
+      display: block;
+      background: #000;
+    }
+
+    #title-image {
+      position: absolute;
+      top: 20%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 60%;
+      max-width: 500px;
+      z-index: 5;
+      opacity: 0.95;
+    }
+
+    #unity-loading-bar {
+      position: absolute;
+      top: 65%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 50%;
+      max-width: 400px;
+      height: 8px;
+      background: rgba(68, 68, 68, 0.8);
+      border-radius: 10px;
+      overflow: hidden;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+    }
+
+
+    #unity-progress-bar-full {
+      width: 0%;
+      height: 100%;
+      background: linear-gradient(to right, #00bcd4, #4caf50);
+      transition: width 0.2s;
+    }
+    #loading-text {
+      position: absolute;
+      top: 70%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      color: #ffffff;
+      font-family: 'Arial', sans-serif;
+      font-size: 18px;
+      font-weight: bold;
+      text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
+      z-index: 5;
+    }
+
+    #unity-warning {
+      position: absolute;
+      top: 10px;
+      left: 10px;
+      color: white;
+      z-index: 10;
+    }
+  </style>
+</head>
+<body>
+  <div id="unity-container">
+    <canvas id="unity-canvas"></canvas>
+    <!-- 타이틀 이미지 -->
+    <div id="title-image">
+      <img src="https://gnmang.github.io/test0t/logo_102.png" alt="Last to Blast" style="width: 100%; height: auto;">
+    </div>
+
+    <div id="unity-loading-bar">
+      <div id="unity-progress-bar-full"></div>
+    </div>
+
+    <div id="loading-text">Loading...</div>
+
+    <div id="unity-warning"></div>
+  </div>
+
+  <script>
+    var container = document.querySelector("#unity-container");
+    var canvas = document.querySelector("#unity-canvas");
+    var loadingBar = document.querySelector("#unity-loading-bar");
+    var progressBarFull = document.querySelector("#unity-progress-bar-full");
+    var warningBanner = document.querySelector("#unity-warning");
+    var loadingText = document.querySelector("#loading-text");
+
+    function unityShowBanner(msg, type) {
+      function updateBannerVisibility() {
+        warningBanner.style.display = warningBanner.children.length ? 'block' : 'none';
+      }
+      var div = document.createElement('div');
+      div.innerHTML = msg;
+      if (type == 'error') div.style = 'background: red; padding: 10px;';
+      else if (type == 'warning') div.style = 'background: yellow; padding: 10px;';
+      warningBanner.appendChild(div);
+      if (type != 'error') {
+        setTimeout(function () {
+          warningBanner.removeChild(div);
+          updateBannerVisibility();
+        }, 5000);
+      }
+      updateBannerVisibility();
+    }
+
+    var buildUrl = "Build";
+    var loaderUrl = buildUrl + "/3f3f096899ca69cd352a0894315c28ac.loader.js";
+    var config = {
+        dataUrl: buildUrl + "/97866e64ba34efcba41e1cbf5cbb26ad.data",
+        frameworkUrl: buildUrl + "/1748bd3e0c1054ad28bef3309292b29d.framework.js",
+        codeUrl: buildUrl + "/a7e9d7c9d7f8b10d413bf87f6bfd9a16.wasm",
+      streamingAssetsUrl: "StreamingAssets",
+      companyName: "demo",
+      productName: "Last to blast",
+      productVersion: "1.0.0.0",
+      showBanner: unityShowBanner
+    };
+
+    if (/iPhone|iPad|iPod|Android/i.test(navigator.userAgent)) {
+      var meta = document.createElement('meta');
+      meta.name = 'viewport';
+      meta.content = 'width=device-width, height=device-height, initial-scale=1.0, user-scalable=no, shrink-to-fit=yes';
+      document.getElementsByTagName('head')[0].appendChild(meta);
+      container.className = "unity-mobile";
+      canvas.className = "unity-mobile";
+      // config.devicePixelRatio = 1;
+    }
+
+    loadingBar.style.display = "block";
+
+    var script = document.createElement("script");
+    script.src = loaderUrl;
+    script.onload = () => {
+      createUnityInstance(canvas, config, (progress) => {
+        progressBarFull.style.width = 100 * progress + "%";
+        loadingText.textContent = `Loading... ${Math.round(progress * 100)}%`;
+      }).then((unityInstance) => {
+        loadingBar.style.display = "none";
+        loadingText.style.display = "none";
+        document.querySelector("#title-image").style.display = "none";
+
+        const refreshToken = localStorage.getItem("AAADE2C83");
+        if (refreshToken) {
+          unityInstance.SendMessage("MainHome", "OnReceiveRefresh", refreshToken);
+        } else {
+          const urlParams = new URLSearchParams(window.location.search);
+          const gameToken = urlParams.get("game_token");
+          if (gameToken) {
+            unityInstance.SendMessage("MainHome", "OnReceiveGameToken", gameToken);
+          }
+        }        
+        
+      }).catch((message) => {
+        alert(message);
+      });
+    };
+    document.body.appendChild(script);
+  </script>
+</body>
+</html>
