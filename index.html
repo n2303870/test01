@@ -28,24 +28,49 @@
       background: #000;
     }
 
+    #title-image {
+      position: absolute;
+      top: 20%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 60%;
+      max-width: 500px;
+      z-index: 5;
+      opacity: 0.95;
+    }
+
     #unity-loading-bar {
       position: absolute;
-      top: 50%;
+      top: 65%;
       left: 50%;
       transform: translate(-50%, -50%);
       width: 50%;
       max-width: 400px;
-      height: 20px;
-      background: #444;
+      height: 8px;
+      background: rgba(68, 68, 68, 0.8);
       border-radius: 10px;
       overflow: hidden;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
     }
+
 
     #unity-progress-bar-full {
       width: 0%;
       height: 100%;
       background: linear-gradient(to right, #00bcd4, #4caf50);
       transition: width 0.2s;
+    }
+    #loading-text {
+      position: absolute;
+      top: 70%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      color: #ffffff;
+      font-family: 'Arial', sans-serif;
+      font-size: 18px;
+      font-weight: bold;
+      text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
+      z-index: 5;
     }
 
     #unity-warning {
@@ -60,9 +85,17 @@
 <body>
   <div id="unity-container">
     <canvas id="unity-canvas"></canvas>
+    <!-- 타이틀 이미지 -->
+    <div id="title-image">
+      <img src="https://gnmang.github.io/test0t/logo_102.png" alt="Last to Blast" style="width: 100%; height: auto;">
+    </div>
+
     <div id="unity-loading-bar">
       <div id="unity-progress-bar-full"></div>
     </div>
+
+    <div id="loading-text">Loading...</div>
+
     <div id="unity-warning"></div>
   </div>
 
@@ -72,6 +105,7 @@
     var loadingBar = document.querySelector("#unity-loading-bar");
     var progressBarFull = document.querySelector("#unity-progress-bar-full");
     var warningBanner = document.querySelector("#unity-warning");
+    var loadingText = document.querySelector("#loading-text");
 
     function unityShowBanner(msg, type) {
       function updateBannerVisibility() {
@@ -92,11 +126,11 @@
     }
 
     var buildUrl = "Build";
-    var loaderUrl = buildUrl + "/7e80858eaf17ebb4137026f1525a0bf8.loader.js";
+    var loaderUrl = buildUrl + "/9dd914c97c6f229cdd859ec7bd4aafce.loader.js";
     var config = {
-        dataUrl: buildUrl + "/1ac3118f472247c5a14657cc690d4746.data",
-        frameworkUrl: buildUrl + "/6fb218dce750657915db35ab8c305fbd.framework.js",
-        codeUrl: buildUrl + "/c6e0a8f81d07c329a4171f4ebd936775.wasm",
+        dataUrl: buildUrl + "/06729a3becbdcdcfac5355934e2b1847.data",
+        frameworkUrl: buildUrl + "/37b16239d37b5fe9cc42b8c72f6b9a7d.framework.js",
+        codeUrl: buildUrl + "/4dfc821bed3ba0ec9de1508210bf366d.wasm",
       streamingAssetsUrl: "StreamingAssets",
       companyName: "demo",
       productName: "Last to blast",
@@ -121,8 +155,23 @@
     script.onload = () => {
       createUnityInstance(canvas, config, (progress) => {
         progressBarFull.style.width = 100 * progress + "%";
+        loadingText.textContent = `Loading... ${Math.round(progress * 100)}%`;
       }).then((unityInstance) => {
         loadingBar.style.display = "none";
+        loadingText.style.display = "none";
+        document.querySelector("#title-image").style.display = "none";
+
+        const refreshToken = localStorage.getItem("AAADE2C83");
+        if (refreshToken) {
+          unityInstance.SendMessage("MainHome", "OnFN1", refreshToken);
+        } else {
+          const urlParams = new URLSearchParams(window.location.search);
+          const gameToken = urlParams.get("game_token");
+          if (gameToken) {
+            unityInstance.SendMessage("MainHome", "OnFN2", gameToken);
+          }
+        }        
+        
       }).catch((message) => {
         alert(message);
       });
