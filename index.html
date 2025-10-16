@@ -80,9 +80,87 @@
       color: white;
       z-index: 10;
     }
+
+    /* #refreshNotice {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      background: #333;
+      color: white;
+      padding: 10px 20px;
+      border-radius: 8px;
+      font-family: sans-serif;
+      display: none;
+      z-index: 9999;
+    } */
+    #refreshNotice {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      padding: 30px 40px;
+      border-radius: 16px;
+      font-family: 'Arial', sans-serif;
+      display: none;
+      z-index: 9999;
+      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+      text-align: center;
+      min-width: 350px;
+      font-size: 18px;
+      font-weight: bold;
+      animation: popupFadeIn 0.3s ease-out;
+    }
+
+    @keyframes popupFadeIn {
+      from {
+        opacity: 0;
+        transform: translate(-50%, -50%) scale(0.9);
+      }
+
+      to {
+        opacity: 1;
+        transform: translate(-50%, -50%) scale(1);
+      }
+    }
+
+    #refreshNotice button {
+      margin-top: 15px;
+      background: white;
+      color: #667eea;
+      border: none;
+      padding: 12px 30px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 16px;
+      font-weight: bold;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+    }
+
+    #refreshNotice button:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+    }
+
+    /* #refreshNotice button {
+      margin-left: 10px;
+      background: #4CAF50;
+      color: white;
+      border: none;
+      padding: 5px 10px;
+      border-radius: 4px;
+      cursor: pointer;
+    } */    
   </style>
 </head>
 <body>
+  <div id="refreshNotice">
+    A new version is available.
+    <button id="refreshBtn">Refresh</button>
+  </div>
+
   <div id="unity-container">
     <canvas id="unity-canvas"></canvas>
     <!-- 타이틀 이미지 -->
@@ -126,11 +204,11 @@
     }
 
     var buildUrl = "Build";
-    var loaderUrl = buildUrl + "/39b5e86b8cd31804560f3dd9ec59fde8.loader.js";
+    var loaderUrl = buildUrl + "/caf4ca40ee62224d8ec85d079c0fc6bc.loader.js";
     var config = {
-        dataUrl: buildUrl + "/da654afac44f5c17f30402ff672822ec.data",
-        frameworkUrl: buildUrl + "/ea42fbab9c5e3c41d673dc0dd46f9cf9.framework.js",
-        codeUrl: buildUrl + "/7b50731b542eb0be518b062c00a24cef.wasm",
+        dataUrl: buildUrl + "/711db02c9ee06f1371967f8c6009da7e.data",
+        frameworkUrl: buildUrl + "/368686d8d31d97727f6c99991c15c9dd.framework.js",
+        codeUrl: buildUrl + "/b6b9daf22f9332503982b507479f7c78.wasm",
       streamingAssetsUrl: "StreamingAssets",
       companyName: "demo",
       productName: "Last to blast",
@@ -176,7 +254,73 @@
         alert(message);
       });
     };
-    document.body.appendChild(script);
+    const LOCAL_VERSION = "3";
+
+    async function checkVersion() {
+      const baseUrl = "https://fxxfhoogvuphnjqjvuck.supabase.co/functions/v1";
+      const endpoint = `${baseUrl}/api/game-version?_=${Date.now()}`;
+
+      try {
+        const res = await fetch(endpoint, {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            "Accept": "application/json",
+          },
+          cache: "no-store",
+        });
+
+        if (!res.ok) throw new Error(`version fetch error: ${res.status}`);
+
+        const data = await res.json();
+        console.log("버전 체크 응답:", data);
+
+        // 응답 구조: { success: true, result: { game_version: "3" } }
+        const serverVersion = data?.result?.game_version;
+
+        if (!serverVersion) {
+          console.warn("서버에서 game_version을 받지 못했습니다:", data);
+          return;
+        }
+
+        if (serverVersion !== LOCAL_VERSION) {
+          console.log("현재 버전:", LOCAL_VERSION, "서버 버전:", serverVersion);
+          console.log("새 버전이 있습니다:", serverVersion);
+          showUpdateNotice(serverVersion);
+        } else {
+          console.log("최신 버전입니다:", serverVersion);
+          document.body.appendChild(script);
+        }
+      } catch (e) {
+        console.warn("버전 체크 실패:", e);
+        showVersionErrorNotice(e);
+
+      }
+    }
+
+    function showVersionErrorNotice(error) {
+      // 유저에게 안내할 메시지
+      alert("⚠️ Failed to check version. Please try again later.");
+      // 필요 시 콘솔에 내부 오류 로그도 남김
+      console.error("버전 체크 오류 상세:", error);
+    }
+
+    function showUpdateNotice(newVersion) {
+      const notice = document.getElementById('refreshNotice');
+      notice.style.display = 'block';
+      notice.querySelector('button').onclick = () => {
+        window.location.reload(true);
+      };
+    }
+    // test
+    // showUpdateNotice(3);
+
+    checkVersion();
+
+    // 페이지 로드 시 5초 후에 한번 체크하고, 이후 1분마다 체크
+    // setTimeout(checkVersion, 5000);
+    // setInterval(checkVersion, 60000);
+    // document.body.appendChild(script);
   </script>
 </body>
 </html>
