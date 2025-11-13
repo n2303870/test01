@@ -239,16 +239,42 @@
         loadingText.style.display = "none";
         document.querySelector("#title-image").style.display = "none";
 
-        const refreshToken = localStorage.getItem("AAADE2C83");
-        if (refreshToken) {
-          unityInstance.SendMessage("MainHome", "OnFN1", refreshToken);
-        } else {
-          const urlParams = new URLSearchParams(window.location.search);
-          const gameToken = urlParams.get("game_token");
-          if (gameToken) {
-            unityInstance.SendMessage("MainHome", "OnFN2", gameToken);
-          }
-        }        
+        // const refreshToken = localStorage.getItem("AAADE2C83");
+        // if (refreshToken) {
+        //   unityInstance.SendMessage("MainHome", "OnFN1", refreshToken);
+        // } else {
+        //   const urlParams = new URLSearchParams(window.location.search);
+        //   const gameToken = urlParams.get("game_token");
+        //   if (gameToken) {
+        //     unityInstance.SendMessage("MainHome", "OnFN2", gameToken);
+        //   }
+        // }  
+        
+const urlParams = new URLSearchParams(window.location.search);
+const gameToken = urlParams.get("game_token");
+const refreshToken = localStorage.getItem("AAADE2C83");
+
+// 이미 사용된 game_token을 저장할 키
+const usedTokenKey = "USED_GAME_TOKEN";
+const usedGameToken = localStorage.getItem(usedTokenKey);
+
+if (gameToken) {
+  if (usedGameToken === gameToken) {
+    // 이미 사용된 game_token이면 refreshToken 로그인
+    if (refreshToken) {
+      unityInstance.SendMessage("MainHome", "OnFN1", refreshToken);
+    } else {
+      console.warn("이미 사용된 game_token이지만 refreshToken이 없습니다.");
+    }
+  } else {
+    // 처음 보는 game_token이면 게임 토큰 로그인
+    unityInstance.SendMessage("MainHome", "OnFN2", gameToken);
+    localStorage.setItem(usedTokenKey, gameToken);
+  }
+} else if (refreshToken) {
+  // game_token이 없으면 refreshToken 로그인
+  unityInstance.SendMessage("MainHome", "OnFN1", refreshToken);
+}        
         
       }).catch((message) => {
         alert(message);
