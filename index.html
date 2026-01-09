@@ -1,352 +1,66 @@
 <!DOCTYPE html>
-<html lang="en-us">
+<html lang="ko">
 <head>
-  <meta charset="utf-8">
-  <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-  <title>Last to blast</title>
+  <meta charset="UTF-8">
+  <title>점검중</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
   <style>
-    html, body {
+    body {
       margin: 0;
       padding: 0;
-      background: #111;
       width: 100%;
-      height: 100%;
-      overflow: hidden;
-    }
-
-    #unity-container {
-      position: absolute;
-      top: 0; left: 0; right: 0; bottom: 0;
-      width: 100%;
-      height: 100%;
-    }
-
-    canvas {
-      width: 100% !important;
-      height: 100% !important;
-      display: block;
-      background: #000;
-    }
-
-    #title-image {
-      position: absolute;
-      top: 20%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      width: 60%;
-      max-width: 500px;
-      z-index: 5;
-      opacity: 0.95;
-    }
-
-    #unity-loading-bar {
-      position: absolute;
-      top: 65%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      width: 50%;
-      max-width: 400px;
-      height: 8px;
-      background: rgba(68, 68, 68, 0.8);
-      border-radius: 10px;
-      overflow: hidden;
-      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
-    }
-
-
-    #unity-progress-bar-full {
-      width: 0%;
-      height: 100%;
-      background: linear-gradient(to right, #00bcd4, #4caf50);
-      transition: width 0.2s;
-    }
-    #loading-text {
-      position: absolute;
-      top: 70%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      color: #ffffff;
+      height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      background: linear-gradient(135deg, #0f0f0f, #1a1a1a);
       font-family: 'Arial', sans-serif;
-      font-size: 18px;
-      font-weight: bold;
-      text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
-      z-index: 5;
+      color: white;
+      overflow: hidden;
     }
 
-    #unity-warning {
-      position: absolute;
-      top: 10px;
-      left: 10px;
-      color: white;
-      z-index: 10;
-    }
-
-    /* #refreshNotice {
-      position: fixed;
-      bottom: 20px;
-      right: 20px;
-      background: #333;
-      color: white;
-      padding: 10px 20px;
-      border-radius: 8px;
-      font-family: sans-serif;
-      display: none;
-      z-index: 9999;
-    } */
-    #refreshNotice {
-      position: fixed;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-      color: white;
-      padding: 30px 40px;
+    .box {
+      background: rgba(255, 255, 255, 0.08);
+      padding: 40px 50px;
       border-radius: 16px;
-      font-family: 'Arial', sans-serif;
-      display: none;
-      z-index: 9999;
-      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
       text-align: center;
-      min-width: 350px;
-      font-size: 18px;
-      font-weight: bold;
-      animation: popupFadeIn 0.3s ease-out;
+      box-shadow: 0 10px 40px rgba(0,0,0,0.5);
+      animation: fadeIn 0.5s ease-out;
     }
 
-    @keyframes popupFadeIn {
+    .title {
+      font-size: 32px;
+      font-weight: bold;
+      margin-bottom: 20px;
+    }
+
+    .msg {
+      font-size: 18px;
+      opacity: 0.85;
+      line-height: 1.5em;
+    }
+
+    @keyframes fadeIn {
       from {
         opacity: 0;
-        transform: translate(-50%, -50%) scale(0.9);
+        transform: scale(0.95);
       }
-
       to {
         opacity: 1;
-        transform: translate(-50%, -50%) scale(1);
+        transform: scale(1);
       }
     }
-
-    #refreshNotice button {
-      margin-top: 15px;
-      background: white;
-      color: #667eea;
-      border: none;
-      padding: 12px 30px;
-      border-radius: 8px;
-      cursor: pointer;
-      font-size: 16px;
-      font-weight: bold;
-      transition: all 0.3s ease;
-      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
-    }
-
-    #refreshNotice button:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
-    }
-
-    /* #refreshNotice button {
-      margin-left: 10px;
-      background: #4CAF50;
-      color: white;
-      border: none;
-      padding: 5px 10px;
-      border-radius: 4px;
-      cursor: pointer;
-    } */    
   </style>
 </head>
 <body>
-  <div id="refreshNotice">
-    A new version is available.
-    <button id="refreshBtn">Refresh</button>
-  </div>
-
-  <div id="unity-container">
-    <canvas id="unity-canvas"></canvas>
-    <!-- 타이틀 이미지 -->
-    <div id="title-image">
-      <img src="https://gnmang.github.io/test0t/logo_102.png" alt="Last to Blast" style="width: 100%; height: auto;">
+  <div class="box">
+    <div class="title">🚧 점검중입니다</div>
+    <div class="msg">
+      보다 나은 서비스를 위해<br>
+      현재 서버 점검을 진행 중입니다.<br><br>
+      잠시 후 다시 접속해주세요!
     </div>
-
-    <div id="unity-loading-bar">
-      <div id="unity-progress-bar-full"></div>
-    </div>
-
-    <div id="loading-text">Loading...</div>
-
-    <div id="unity-warning"></div>
   </div>
-
-  <script>
-    var container = document.querySelector("#unity-container");
-    var canvas = document.querySelector("#unity-canvas");
-    var loadingBar = document.querySelector("#unity-loading-bar");
-    var progressBarFull = document.querySelector("#unity-progress-bar-full");
-    var warningBanner = document.querySelector("#unity-warning");
-    var loadingText = document.querySelector("#loading-text");
-
-    function unityShowBanner(msg, type) {
-      function updateBannerVisibility() {
-        warningBanner.style.display = warningBanner.children.length ? 'block' : 'none';
-      }
-      var div = document.createElement('div');
-      div.innerHTML = msg;
-      if (type == 'error') div.style = 'background: red; padding: 10px;';
-      else if (type == 'warning') div.style = 'background: yellow; padding: 10px;';
-      warningBanner.appendChild(div);
-      if (type != 'error') {
-        setTimeout(function () {
-          warningBanner.removeChild(div);
-          updateBannerVisibility();
-        }, 5000);
-      }
-      updateBannerVisibility();
-    }
-
-    var buildUrl = "Build";
-    var loaderUrl = buildUrl + "/5be2cc0bb3bccb1a18582517e5df7738.loader.js";
-    var config = {
-        dataUrl: buildUrl + "/a3bdae262cc22ade8158b882460091b9.data",
-        frameworkUrl: buildUrl + "/8e292d7c7054f0688e94339597f9576b.framework.js",
-        codeUrl: buildUrl + "/67c5dc0c22a3285e74b9cce24b7923e4.wasm",
-      streamingAssetsUrl: "StreamingAssets",
-      companyName: "demo",
-      productName: "Last to blast",
-      productVersion: "1.0.0.0",
-      showBanner: unityShowBanner
-    };
-
-    if (/iPhone|iPad|iPod|Android/i.test(navigator.userAgent)) {
-      var meta = document.createElement('meta');
-      meta.name = 'viewport';
-      meta.content = 'width=device-width, height=device-height, initial-scale=1.0, user-scalable=no, shrink-to-fit=yes';
-      document.getElementsByTagName('head')[0].appendChild(meta);
-      container.className = "unity-mobile";
-      canvas.className = "unity-mobile";
-      // config.devicePixelRatio = 1;
-    }
-
-    loadingBar.style.display = "block";
-
-    var script = document.createElement("script");
-    script.src = loaderUrl;
-    script.onload = () => {
-      createUnityInstance(canvas, config, (progress) => {
-        progressBarFull.style.width = 100 * progress + "%";
-        loadingText.textContent = `Loading... ${Math.round(progress * 100)}%`;
-      }).then((unityInstance) => {
-        loadingBar.style.display = "none";
-        loadingText.style.display = "none";
-        document.querySelector("#title-image").style.display = "none";
-
-        // const refreshToken = localStorage.getItem("AAADE2C83");
-        // if (refreshToken) {
-        //   unityInstance.SendMessage("MainHome", "OnFN1", refreshToken);
-        // } else {
-        //   const urlParams = new URLSearchParams(window.location.search);
-        //   const gameToken = urlParams.get("game_token");
-        //   if (gameToken) {
-        //     unityInstance.SendMessage("MainHome", "OnFN2", gameToken);
-        //   }
-        // }  
-        
-const urlParams = new URLSearchParams(window.location.search);
-const gameToken = urlParams.get("game_token");
-const refreshToken = localStorage.getItem("AAADE2C83");
-
-// 이미 사용된 game_token을 저장할 키
-const usedTokenKey = "USED_GAME_TOKEN";
-const usedGameToken = localStorage.getItem(usedTokenKey);
-
-if (gameToken) {
-  if (usedGameToken === gameToken) {
-    // 이미 사용된 game_token이면 refreshToken 로그인
-    if (refreshToken) {
-      unityInstance.SendMessage("MainHome", "OnFN1", refreshToken);
-    } else {
-      console.warn("이미 사용된 game_token이지만 refreshToken이 없습니다.");
-    }
-  } else {
-    // 처음 보는 game_token이면 게임 토큰 로그인
-    unityInstance.SendMessage("MainHome", "OnFN2", gameToken);
-    localStorage.setItem(usedTokenKey, gameToken);
-  }
-} else if (refreshToken) {
-  // game_token이 없으면 refreshToken 로그인
-  unityInstance.SendMessage("MainHome", "OnFN1", refreshToken);
-}        
-        
-      }).catch((message) => {
-        alert(message);
-      });
-    };
-    const LOCAL_VERSION = "16";
-
-    async function checkVersion() {
-      const baseUrl = "https://hhurqfkffyqsgqiazjmz.supabase.co/functions/v1";
-      const endpoint = `${baseUrl}/api/game-version?_=${Date.now()}`;
-
-      try {
-        const res = await fetch(endpoint, {
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-            "Accept": "application/json",
-          },
-          cache: "no-store",
-        });
-
-        if (!res.ok) throw new Error(`version fetch error: ${res.status}`);
-
-        const data = await res.json();
-        console.log("버전 체크 응답:", data);
-
-        // 응답 구조: { success: true, result: { game_version: "3" } }
-        const serverVersion = data?.result?.game_version;
-
-        if (!serverVersion) {
-          console.warn("서버에서 game_version을 받지 못했습니다:", data);
-          return;
-        }
-
-        if (serverVersion !== LOCAL_VERSION) {
-          console.log("현재 버전:", LOCAL_VERSION, "서버 버전:", serverVersion);
-          console.log("새 버전이 있습니다:", serverVersion);
-          showUpdateNotice(serverVersion);
-        } else {
-          console.log("최신 버전입니다:", serverVersion);
-          document.body.appendChild(script);
-        }
-      } catch (e) {
-        console.warn("버전 체크 실패:", e);
-        showVersionErrorNotice(e);
-
-      }
-    }
-
-    function showVersionErrorNotice(error) {
-      // 유저에게 안내할 메시지
-      alert("⚠️ Failed to check version. Please try again later.");
-      // 필요 시 콘솔에 내부 오류 로그도 남김
-      console.error("버전 체크 오류 상세:", error);
-    }
-
-    function showUpdateNotice(newVersion) {
-      const notice = document.getElementById('refreshNotice');
-      notice.style.display = 'block';
-      notice.querySelector('button').onclick = () => {
-        window.location.reload(true);
-      };
-    }
-    // test
-    // showUpdateNotice(3);
-
-    checkVersion();
-
-    // 페이지 로드 시 5초 후에 한번 체크하고, 이후 1분마다 체크
-    // setTimeout(checkVersion, 5000);
-    // setInterval(checkVersion, 60000);
-    // document.body.appendChild(script);
-  </script>
 </body>
 </html>
